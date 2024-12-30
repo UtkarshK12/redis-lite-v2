@@ -23,7 +23,7 @@ public class Main {
           while((clientSocket=serverSocket.accept())!=null){
               Socket finalClientSocket = clientSocket;
               threadPool.submit(()->{
-                  RequestListener requestReceiver = new RequestListener(finalClientSocket);
+                  RequestListenerService requestReceiver = new RequestListenerService(finalClientSocket);
                   try {
                       requestReceiver.listen();
                   } catch (IOException e) {
