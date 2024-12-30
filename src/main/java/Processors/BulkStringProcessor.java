@@ -1,4 +1,10 @@
-package org.example;
+package Processors;
+
+import Services.EchoResponseService;
+import Services.GetKeyResponseService;
+import Services.PingResponseService;
+import Services.SetKeyResponseService;
+import memoryStore.InMemDataStore;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,7 +14,7 @@ import java.util.List;
 
 public class BulkStringProcessor {
 
-    public static void handleRequest(String input, BufferedReader in, PrintWriter out) throws IOException {
+    public static void handleRequest(String input, BufferedReader in, PrintWriter out, InMemDataStore inMemDataStore) throws IOException {
 
             //getting number of arguments
             int numOfArguments= Integer.parseInt(input.substring(1));
@@ -25,11 +31,17 @@ public class BulkStringProcessor {
             }
 
             if(reqStrings.getFirst().equalsIgnoreCase("echo")){
-                EchoResponseService.echoResponse(reqStrings,out);
+                EchoResponseService.echoResponse(reqStrings.get(1),out);
             }
             else if (reqStrings.getFirst().equalsIgnoreCase("ping")){
-                System.out.println("*********** ping inside");
                 PingResponseService.replyPong(out);
+            }
+
+            else if(reqStrings.getFirst().equalsIgnoreCase("set")){
+                SetKeyResponseService.add(inMemDataStore,reqStrings,out);
+            }
+            else if(reqStrings.getFirst().equalsIgnoreCase("get")){
+                GetKeyResponseService.getKey(inMemDataStore,reqStrings,out);
             }
     }
 

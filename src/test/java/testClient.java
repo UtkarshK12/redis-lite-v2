@@ -5,7 +5,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.ExecutorService;
@@ -13,8 +16,6 @@ import java.util.concurrent.Executors;
 import java.util.stream.IntStream;
 
 public class testClient {
-
-
 
     @Test
     public void testEcho() throws IOException {
@@ -76,6 +77,16 @@ public class testClient {
         }
     }
 
+    @Test
+    public void testSet() throws IOException {
+        String inp = "*3\r\n$3\r\nSET\r\n$3\r\nfoo\r\n$3\r\nbar\r\n";
+        Socket socket = new Socket("localhost", 6379);
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
+        out.println(inp);
+        String response = in.readLine();
+        Assert.assertEquals("+OK", response);  // Redis responds with "+OK" for successful SET
+    }
 
 }

@@ -1,9 +1,9 @@
-package org.example;
+package Services;
 
 import java.io.PrintWriter;
 
 public class PingResponseService {
     public static void replyPong(PrintWriter out){
-        out.println("+PONG");
+        out.println("+PONG\r");
     }
 }

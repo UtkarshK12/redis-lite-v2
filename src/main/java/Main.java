@@ -1,4 +1,4 @@
-package org.example;
+import memoryStore.InMemDataStore;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -18,12 +18,14 @@ public class Main {
         try {
           serverSocket = new ServerSocket(port);
           serverSocket.setReuseAddress(true);
+          //create a hashmap datastore
+          InMemDataStore inMemDataStore = new InMemDataStore();
 
           threadPool = Executors.newFixedThreadPool(30);
           while((clientSocket=serverSocket.accept())!=null){
               Socket finalClientSocket = clientSocket;
               threadPool.submit(()->{
-                  RequestListenerService requestReceiver = new RequestListenerService(finalClientSocket);
+                  RequestListenerService requestReceiver = new RequestListenerService(finalClientSocket, inMemDataStore);
                   try {
                       requestReceiver.listen();
                   } catch (IOException e) {
