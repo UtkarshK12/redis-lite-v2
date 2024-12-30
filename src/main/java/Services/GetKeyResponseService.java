@@ -10,6 +10,11 @@ public class GetKeyResponseService {
     public static void getKey( InMemDataStore inMemDataStore, List<String> reqString,PrintWriter out){
         String key = reqString.get(1);
         String response = inMemDataStore.get(key);
-        EchoResponseService.echoResponse(response,out);
+        if(response!=null){
+            EchoResponseService.echoResponse(response,out);
+        }
+        else{
+            out.println("$-1\r");
+        }
     }
 }

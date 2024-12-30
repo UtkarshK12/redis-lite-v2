@@ -27,6 +27,7 @@ public class testClient {
         out.println(inp);
         Assert.assertEquals(in.readLine(),"$3");
         Assert.assertEquals(in.readLine(),"hey");
+        socket.close();
 
     }
 
@@ -77,16 +78,62 @@ public class testClient {
         }
     }
 
+
     @Test
-    public void testSet() throws IOException {
-        String inp = "*3\r\n$3\r\nSET\r\n$3\r\nfoo\r\n$3\r\nbar\r\n";
+    public void testGetSet() throws IOException {
+        // Test SET
+        String addRequest = "*3\r\n$3\r\nSET\r\n$3\r\nfoo\r\n$3\r\nbar\r";
         Socket socket = new Socket("localhost", 6379);
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
 
-        out.println(inp);
+        out.println(addRequest);
         String response = in.readLine();
-        Assert.assertEquals("+OK", response);  // Redis responds with "+OK" for successful SET
+        Assert.assertEquals("+OK", response);
+
+        // Test GET
+        String getRequest = "*2\r\n$3\r\nGET\r\n$3\r\nfoo\r";
+        out.println(getRequest);
+        String lengthResponse = in.readLine();  // First line contains $3 (length of "bar")
+        String valueResponse = in.readLine();   // Second line contains the actual value
+
+        Assert.assertEquals("$3", lengthResponse);  // Length prefix for "bar"
+        Assert.assertEquals("bar", valueResponse);  // The actual value
+
+        socket.close();
     }
+    @Test
+    public void testGetSetWithTimeout() throws IOException, InterruptedException {
+
+        String addRequest = "*5\r\n$3\r\nSET\r\n$3\r\nfoo\r\n$3\r\nbar\r\n$2\r\npx\r\n$4\r\n1000\r";
+        Socket socket = new Socket("localhost", 6379);
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+        out.println(addRequest);
+        String response = in.readLine();
+        Assert.assertEquals("+OK", response);
+
+        // Test GET
+        String getRequest = "*2\r\n$3\r\nGET\r\n$3\r\nfoo\r";
+        out.println(getRequest);
+        String lengthResponse = in.readLine();  // First line contains $3 (length of "bar")
+        String valueResponse = in.readLine();   // Second line contains the actual value
+
+        Assert.assertEquals("$3", lengthResponse);  // Length prefix for "bar"
+        Assert.assertEquals("bar", valueResponse);  // The actual value
+
+        //waiting 1000ms till the cache is invalidated
+        Thread.sleep(1000);
+
+        out.println(getRequest);
+        response = in.readLine();
+
+        Assert.assertEquals("$-1", response);  // since the data is invalidated we will receive empty
+
+        socket.close();
+
+    }
+
 
 }

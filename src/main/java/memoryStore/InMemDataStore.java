@@ -1,36 +1,28 @@
 package memoryStore;
 
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class InMemDataStore {
-    public HashMap<String,String> dataStore;
-    static ReentrantLock lock;
+    private final ConcurrentHashMap<String, String> dataStore;
 
-    public InMemDataStore(){
-        dataStore=new HashMap<>();
-        lock=new ReentrantLock(true);
-    }
-    public void add(String key, String value){
-        try{
-            lock.lock();
-            dataStore.put(key,value);
-        }
-        finally {
-            lock.unlock();
-        }
+    public InMemDataStore() {
+        dataStore = new ConcurrentHashMap<>();
     }
 
-    public String get(String key){
-        try {
-            lock.lock();
-            if(dataStore.containsKey(key)){
-                return dataStore.get(key);
-            }
-        }
-        finally {
-            lock.unlock();
-        }
-        return null;
+    public void add(String key, String value) {
+        System.out.println("***** adding key : "+ key+" : "+ value);
+        dataStore.put(key, value);
+    }
+
+    public String get(String key) {
+        System.out.println("****** fetching key : "+ dataStore.get(key));
+        return dataStore.get(key);
+    }
+
+    public void removeKey(String key) {
+        System.out.println("****** removing key : "+ key);
+        dataStore.remove(key);
     }
 }
