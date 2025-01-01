@@ -1,5 +1,6 @@
 package Services;
 
+import ResponseParser.RESPEchoParser;
 import memoryStore.InMemDataStore;
 
 import java.io.PrintWriter;
@@ -11,7 +12,7 @@ public class GetKeyResponseService {
         String key = reqString.get(1);
         String response = inMemDataStore.get(key);
         if(response!=null){
-            EchoResponseService.echoResponse(response,out);
+            RESPEchoParser.echoResponse(response,out);
         }
         else{
             out.println("$-1\r");

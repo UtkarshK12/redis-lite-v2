@@ -49,12 +49,12 @@ public class testClient {
                                     // First PING
                                     out.println("PING");
                                     String response1 = in.readLine();
-                                    System.out.println("Response 1: " + response1);  // Debug log
+                                    System.out.println("Response 1: " + response1);
 
                                     // Second PING
                                     out.println("PING");
                                     String response2 = in.readLine();
-                                    System.out.println("Response 2: " + response2);  // Debug log
+                                    System.out.println("Response 2: " + response2);
 
                                     Assert.assertEquals("+PONG", response1);
                                     Assert.assertEquals("+PONG", response2);
@@ -74,7 +74,7 @@ public class testClient {
                             .toArray(CompletableFuture[]::new)
             ).join();
         } finally {
-            pool.shutdownNow();  // Force shutdown if test hangs
+            pool.shutdownNow();
         }
     }
 
@@ -94,11 +94,11 @@ public class testClient {
         // Test GET
         String getRequest = "*2\r\n$3\r\nGET\r\n$3\r\nfoo\r";
         out.println(getRequest);
-        String lengthResponse = in.readLine();  // First line contains $3 (length of "bar")
-        String valueResponse = in.readLine();   // Second line contains the actual value
+        String lengthResponse = in.readLine();
+        String valueResponse = in.readLine();
 
-        Assert.assertEquals("$3", lengthResponse);  // Length prefix for "bar"
-        Assert.assertEquals("bar", valueResponse);  // The actual value
+        Assert.assertEquals("$3", lengthResponse);
+        Assert.assertEquals("bar", valueResponse);
 
         socket.close();
     }
@@ -117,11 +117,11 @@ public class testClient {
         // Test GET
         String getRequest = "*2\r\n$3\r\nGET\r\n$3\r\nfoo\r";
         out.println(getRequest);
-        String lengthResponse = in.readLine();  // First line contains $3 (length of "bar")
-        String valueResponse = in.readLine();   // Second line contains the actual value
+        String lengthResponse = in.readLine();
+        String valueResponse = in.readLine();
 
-        Assert.assertEquals("$3", lengthResponse);  // Length prefix for "bar"
-        Assert.assertEquals("bar", valueResponse);  // The actual value
+        Assert.assertEquals("$3", lengthResponse);
+        Assert.assertEquals("bar", valueResponse);
 
         //waiting 1000ms till the cache is invalidated
         Thread.sleep(1000);
@@ -135,5 +135,43 @@ public class testClient {
 
     }
 
+    @Test
+    public void testConfigGet() throws IOException {
+        Socket socket = new Socket("localhost", 6379);
+        BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
+
+        String dirConfigRequest = "*3\r\n$6\r\nCONFIG\r\n$3\r\nGET\r\n$3\r\ndir\r";
+        out.println(dirConfigRequest);
+
+        String arrayLengthResponse = in.readLine();
+        String keyLengthResponse = in.readLine();
+        String keyResponse = in.readLine();
+        String valueLengthResponse = in.readLine();
+        String valueResponse = in.readLine();
+
+        Assert.assertEquals("*2", arrayLengthResponse);
+        Assert.assertEquals("$3", keyLengthResponse);
+        Assert.assertEquals("dir", keyResponse);
+        Assert.assertEquals("$4", valueLengthResponse);
+        Assert.assertEquals("/tmp", valueResponse);
+
+        String dbFilenameConfigRequest = "*3\r\n$6\r\nCONFIG\r\n$3\r\nGET\r\n$9\r\ndbfilename\r";
+        out.println(dbFilenameConfigRequest);
+
+        arrayLengthResponse = in.readLine();
+        keyLengthResponse = in.readLine();
+        keyResponse = in.readLine();
+        valueLengthResponse = in.readLine();
+        valueResponse = in.readLine();
+
+        Assert.assertEquals("*2", arrayLengthResponse);
+        Assert.assertEquals("$10", keyLengthResponse);
+        Assert.assertEquals("dbfilename", keyResponse);
+        Assert.assertEquals("$4", valueLengthResponse);
+        Assert.assertEquals("temp", valueResponse);
+
+        socket.close();
+    }
 
 }

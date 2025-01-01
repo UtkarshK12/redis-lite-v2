@@ -1,4 +1,5 @@
 import memoryStore.InMemDataStore;
+import memoryStore.RDBFilesConfig;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -19,7 +20,11 @@ public class Main {
           serverSocket = new ServerSocket(port);
           serverSocket.setReuseAddress(true);
           //create a hashmap datastore
-          InMemDataStore inMemDataStore = new InMemDataStore();
+
+          RDBFilesConfig rdbFilesConfig = new RDBFilesConfig();
+          rdbFilesConfig.setConfig(args);
+
+          InMemDataStore inMemDataStore = new InMemDataStore(rdbFilesConfig);
 
           threadPool = Executors.newFixedThreadPool(30);
           while((clientSocket=serverSocket.accept())!=null){

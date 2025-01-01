@@ -1,14 +1,16 @@
 package memoryStore;
 
-import java.util.HashMap;
+
+
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class InMemDataStore {
     private final ConcurrentHashMap<String, String> dataStore;
+    private RDBFilesConfig rdbFilesConfig;
 
-    public InMemDataStore() {
+    public InMemDataStore(RDBFilesConfig rdbFilesConfig) {
         dataStore = new ConcurrentHashMap<>();
+        this.rdbFilesConfig=rdbFilesConfig;
     }
 
     public void add(String key, String value) {
@@ -24,5 +26,9 @@ public class InMemDataStore {
     public void removeKey(String key) {
         System.out.println("****** removing key : "+ key);
         dataStore.remove(key);
+    }
+
+    public RDBFilesConfig getRdbFilesConfig() {
+        return rdbFilesConfig;
     }
 }

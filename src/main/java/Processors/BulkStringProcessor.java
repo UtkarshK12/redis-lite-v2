@@ -1,9 +1,7 @@
 package Processors;
 
-import Services.EchoResponseService;
-import Services.GetKeyResponseService;
-import Services.PingResponseService;
-import Services.SetKeyResponseService;
+import ResponseParser.RESPEchoParser;
+import Services.*;
 import memoryStore.InMemDataStore;
 
 import java.io.BufferedReader;
@@ -31,7 +29,7 @@ public class BulkStringProcessor {
             }
 
             if(reqStrings.getFirst().equalsIgnoreCase("echo")){
-                EchoResponseService.echoResponse(reqStrings.get(1),out);
+                RESPEchoParser.echoResponse(reqStrings.get(1),out);
             }
             else if (reqStrings.getFirst().equalsIgnoreCase("ping")){
                 PingResponseService.replyPong(out);
@@ -42,6 +40,18 @@ public class BulkStringProcessor {
             }
             else if(reqStrings.getFirst().equalsIgnoreCase("get")){
                 GetKeyResponseService.getKey(inMemDataStore,reqStrings,out);
+            }
+            else if(reqStrings.getFirst().equalsIgnoreCase("config")){
+                System.out.println("***** setting config");
+                if(reqStrings.get(1).equalsIgnoreCase("get")){
+                    System.out.println("***** setting get");
+                    if(reqStrings.get(2).equalsIgnoreCase("dir")){
+                        RdbConfigResponseService.sendDbDir(inMemDataStore,reqStrings,out);
+                    }
+                    else if(reqStrings.get(2).equalsIgnoreCase("dbfilename")){
+                        RdbConfigResponseService.sendDbFileName(inMemDataStore,reqStrings,out);
+                    }
+                }
             }
     }
 
